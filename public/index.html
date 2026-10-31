@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f7f8">
+  <meta name="description" content="Türk Sohbet - gerçek zamanlı sohbet odası">
+  <title>Türk Sohbet</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/socket.io/socket.io.js" defer></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <main id="app" class="app-root">
+    <section id="landing" class="landing-screen" aria-label="Sohbete katıl">
+      <div class="landing-content">
+        <header class="brand-block">
+          <h1 class="brand-title"><span class="brand-turk">Türk</span><span class="brand-sohbet">Sohbet</span></h1>
+          <p class="brand-credit">by aptaltiktolyorumlar</p>
+        </header>
+
+        <form id="join-form" class="join-form" autocomplete="off" novalidate>
+          <label class="sr-only" for="name-input">İsim</label>
+          <input
+            id="name-input"
+            class="name-input"
+            name="name"
+            type="text"
+            placeholder="İsmini gir"
+            minlength="3"
+            maxlength="16"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-describedby="name-error"
+            required
+          >
+          <p id="name-error" class="field-error" aria-live="polite"></p>
+          <button id="join-button" class="primary-button join-button" type="submit">
+            <span>Katıl</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+      </div>
+      <div class="landing-orbit orbit-a" aria-hidden="true"></div>
+      <div class="landing-orbit orbit-b" aria-hidden="true"></div>
+    </section>
+
+    <section id="chat" class="chat-screen is-hidden" aria-label="Sohbet odası">
+      <div class="chat-frame">
+        <header class="chat-header">
+          <div class="chat-brand-wrap">
+            <div class="mini-brand"><span>Türk</span><b>Sohbet</b></div>
+            <div class="connection-indicator"><i></i><span id="connection-label">Bağlandı</span></div>
+          </div>
+          <div class="header-right">
+            <div class="online-count"><span class="online-dot"></span><span id="online-count">1 kişi</span></div>
+            <button id="leave-button" class="icon-button leave-button" type="button" aria-label="Sohbetten çık" title="Çıkış yap">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M21 4v16"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="people-strip" aria-label="Çevrimiçi kişiler">
+          <div id="people-list" class="people-list"></div>
+          <span id="you-label" class="you-label"></span>
+        </div>
+
+        <section id="messages" class="messages-area" aria-live="polite" aria-relevant="additions text">
+          <div id="message-list" class="message-list"></div>
+          <div id="empty-state" class="empty-state">
+            <span class="empty-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-9.5A7.5 7.5 0 0 1 10.5 4h2A7.5 7.5 0 0 1 20 11.5Z"/><path d="M8 11h.01M12 11h.01M16 11h.01"/></svg></span>
+            <p>İlk mesajı sen gönder.</p>
+          </div>
+          <div id="scroll-anchor"></div>
+        </section>
+
+        <div id="reply-bar" class="reply-bar is-hidden">
+          <div class="reply-indicator"></div>
+          <div class="reply-copy"><span id="reply-name"></span><p id="reply-text"></p></div>
+          <button id="cancel-reply" class="small-icon-button" type="button" aria-label="Yanıtı iptal et">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+
+        <form id="composer" class="composer" autocomplete="off">
+          <div class="composer-box">
+            <textarea id="message-input" rows="1" maxlength="200" placeholder="Mesajını yaz..." aria-label="Mesajını yaz"></textarea>
+            <div class="composer-bottom">
+              <span id="char-count" class="char-count">0/200</span>
+              <button id="send-button" class="send-button" type="submit" aria-label="Mesaj gönder" title="Gönder">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-7.2 18-3.7-7.1L3 10.2 21 3Z"/><path d="M10.1 13.9 21 3"/></svg>
+              </button>
+            </div>
+          </div>
+          <p id="chat-notice" class="chat-notice" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="menu-backdrop" class="menu-backdrop is-hidden"></div>
+  <div id="message-menu" class="message-menu is-hidden" role="menu" aria-label="Mesaj seçenekleri">
+    <button type="button" data-action="copy" role="menuitem"><span class="menu-icon"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></span>Kopyala</button>
+    <button type="button" data-action="reply" role="menuitem"><span class="menu-icon"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 7 7v3"/></svg></span>Yanıtla</button>
+    <button type="button" data-action="edit" role="menuitem"><span class="menu-icon"><svg viewBox="0 0 24 24"><path d="m14 5 5 5M4 20l4.2-.9L19 8.3a2.1 2.1 0 0 0-3-3L5.2 16.1 4 20Z"/></svg></span>Düzenle</button>
+    <button type="button" data-action="delete" role="menuitem" class="delete-action"><span class="menu-icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></span>Sil</button>
+  </div>
+
+  <div id="toast" class="toast is-hidden" role="status" aria-live="polite"></div>
+</body>
+</html>
