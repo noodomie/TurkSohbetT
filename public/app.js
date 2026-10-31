@@ -29,7 +29,7 @@
   const menuBackdrop = $('#menu-backdrop');
   const toast = $('#toast');
 
-  const NAME_PATTERN = /^[ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZabcçdefgğhıijklmnoöprsştuüvyz0-9]{3,16}$/u;
+  const NAME_PATTERN = /^[\p{L}\p{N}]{3,16}$/u;
   const MAX_CHARS = 200;
   let socket = null;
   let myName = '';
